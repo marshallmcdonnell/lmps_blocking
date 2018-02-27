@@ -61,8 +61,6 @@ class blockFlyvbjergPetersen( BlockingMethod ):
     def scanBlocking( self, data ):
         self.blockDict = {}
 
-        print "M #Blcks  MEAN  VAR  VAR+  VAR-  STD   STD+    STD-"
-        print "---------------------------------------------------"
         M = 0
         while len(data) >= 2:
             M += 1
@@ -96,52 +94,58 @@ class blockFlyvbjergPetersen( BlockingMethod ):
             stdPlus  = std * ( 1.0 + stdStd ) 
             stdMinus = std * ( 1.0 - stdStd ) 
  
-            out = [len(data), stats.mean,\
-                   var, varPlus, varMinus,\
-                   std, stdPlus, stdMinus]
+            out = { "length"    : len(data), 
+                    "mean"      : stats.mean,
+                    "var"       : var,
+                    "var_plus"  : varPlus,
+                    "var_minus" : varMinus,
+                    "std"       : std, 
+                    "std_plus"  : stdPlus, 
+                    "std_minus" : stdMinus
+            }
             self.blockDict[M] = out
+            
            
 
-            print "{0: <2} {1: <4} {2:.3f} " \
-                  "{3:.3f} {4:.3f} {5:.3f} " \
-                  "{6:.3f} {7:.3f} {8:.3f} ".format(  \
-                  M, len(data), stats.mean, \
-                  var, varPlus, varMinus, \
-                  std, stdPlus, stdMinus )
-    
+   
+    def printScanBlocking(self) :
+        print "M #Blcks  MEAN  VAR  VAR+  VAR-  STD   STD+    STD-"
+        print "---------------------------------------------------"
+        for k, v in self.blockDict.items():
+            print "{M: <2} {length: <4} {mean:.3f} " \
+                  "{var:.3f} {var_plus:.3f} {var_minus:.3f} " \
+                  "{std:.3f} {std_plus:.3f} {std_minus:.3f} ".format(M=k, **v )
+
+    #-----------------------------#
+    #   Plot Std. Dev. and its    #
+    #   error bars to determine   #
+    #   plateau of blocking       #
+    #-----------------------------#
+    def plotScanBlocking(self):
+        xlist = []
+        xlist = []
+        ylist = []
+        ylisthi = []
+        ylistlo = []
+
+        for k, v in self.blockDict.items():
+            xlist.append(k)
+            ylist.append(v["std"])
+            ylisthi.append(v["std_plus"])
+            ylistlo.append(v["std_minus"])
 
 
-        #-----------------------------#
-        #   Plot Std. Dev. and its    #
-        #   error bars to determine   #
-        #   plateau of blocking       #
-        #-----------------------------#
-        def printScanBlocking( self ):
-            xlist = []
-            xlist = []
-            ylist = []
-            ylisthi = []
-            ylistlo = []
+        x = np.asarray(xlist)
+        y = np.asarray(ylist)
+        yhi = np.asarray(ylisthi)
+        ylo = np.asarray(ylistlo)
 
-            for M in self.blockDict:
-                xlist.append( M )
-                ylist.append(   output[M][5] )
-                ylisthi.append( output[M][6] )
-                ylistlo.append( output[M][7] )
+        ytop = yhi - y
+        ybot = y - ylo
 
-
-            x = np.asarray( xlist )
-            y = np.asarray( ylist )
-            yhi = np.asarray( ylisthi )
-            ylo = np.asarray( ylistlo )
-
-            ytop = yhi - y
-            ybot = y - ylo
-
-            plt.errorbar( x, y, yerr=(ytop,ybot), fmt='-o' )
-            print "PRINTING PLOT"
-            plt.show()
-            return
+        plt.errorbar( x, y, yerr=(ytop,ybot), fmt='-o' )
+        plt.show()
+        return
 
 #----------------------------------------------------------------------#
 #   Using the standard method by picking # of blocks                   #

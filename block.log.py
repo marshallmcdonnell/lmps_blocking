@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 
 import utils.parserIO as io
-import utils.blocking
+import utils.blocking as blocking
 from   utils.welford import Welford
 
 #---------------------------------#
@@ -52,15 +52,15 @@ if not args.property:
 f = io.selectFileType( args.filetype )
 
 thermo_string = args.property
-data_dict = f.readData( args.filename, thermo_string )
+data_dict = f.readData( args.filename, { thermo_string : float } )
 
 #-------------------------------#
 #    Loop over data             #
 #-------------------------------#
-for i in data_dict:
+for key, value in data_dict.items():
 
-    print "Data file chunk: ", i+1
-    data = data_dict[i]
+    print "Data file chunk: ", key+1
+    data = value[thermo_string]
 
     #-------------------------------#
     #    Initialization - Blocking  #
@@ -81,14 +81,8 @@ for i in data_dict:
     #--------------------------------#
   
     bData = blocking.selectBlockMethod( "Flyvbjerg+Petersen" )
-    output = bData.scanBlocking( data )
-
-    for M in output:
-        xlist.append( M )
-        ylist.append(   output[M][5] )
-        ylisthi.append( output[M][6] )
-        ylistlo.append( output[M][7] )
-    
+    bData.scanBlocking( data )
+    bData.printScanBlocking()
 
     #-----------------------------#
     #   Plot Std. Dev. and its    #
@@ -96,14 +90,5 @@ for i in data_dict:
     #   plateau of blocking       #
     #-----------------------------#
     if args.plot:
-        x = np.asarray( xlist )
-        y = np.asarray( ylist )
-        yhi = np.asarray( ylisthi )
-        ylo = np.asarray( ylistlo )
-
-        ytop = yhi - y
-        ybot = y - ylo
-
-        plt.errorbar( x, y, yerr=(ytop,ybot), fmt='-o' )
-    plt.show()
+        bData.plotScanBlocking()
 

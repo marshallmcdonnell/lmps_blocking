@@ -92,6 +92,7 @@ class FileType(object):
                             "at the very least to readData(...)." )
         '''
 
+        print xcol
         if xcol and not isinstance(xcol, dict):
             raise Exception("In readData(...), xcol must be " \
                             "dictionaries w/ column string as key and "\
