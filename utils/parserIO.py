@@ -154,7 +154,7 @@ class FileType(object):
             else:
                 raise Exception( "ERROR: " + str(set(xcol)) + " NOT Found in "\
                                   + self.fileName + " LAMMPS log file "\
-                                  "header section.")
+                                  "header section. \n Header list: " + ' '.join(header))
 
         # Y column header(s)
         if ycol:
