@@ -33,6 +33,8 @@ parser.add_argument( "property", type=str,
                            like to perform block averaging over.")
 parser.add_argument( "--plot", action="store_true",
                      help="Turn on plotting using PyPlot" )
+parser.add_argument( "--skip_rows", default=0, type=int,
+                     help="Skip this number of rows before block averaging (skip equilibration)" )
 
 args = parser.parse_args()
 
@@ -60,7 +62,8 @@ data_dict = f.readData( args.filename, { thermo_string : float } )
 for key, value in data_dict.items():
 
     print "Data file chunk: ", key+1
-    data = value[thermo_string]
+    data = value[thermo_string][args.skip_rows:]
+    print data
 
     #-------------------------------#
     #    Initialization - Blocking  #
