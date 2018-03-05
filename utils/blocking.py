@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import sys,os, math
 from welford import Welford
 #----------------------------------------------------------------------#
-def selectBlockMethod( method ):
+def selectBlockMethod( method, **kwargs ):
     if      method == "Flyvbjerg+Petersen" or method == "FP" \
          or method == "F+P":
-        return blockFlyvbjergPetersen( method )
+        return blockFlyvbjergPetersen( method, **kwargs )
 
     elif    method == "SetBlocks" or method == "setBlocks" \
          or method == "Standard"  or method == "standard":
-        return blockSetBlocks( method )
+        return blockSetBlocks( methodm, **kwargs )
 
     else:
         raise Exception('Blocking method "' + method + '" not supported (...yet)')
@@ -19,8 +19,9 @@ def selectBlockMethod( method ):
 #   Parent Blocking Class - inherited by all others and calls others   #
 #----------------------------------------------------------------------#
 class BlockingMethod( object ):
-    def __init__( self, blockingMethod ):
+    def __init__( self, blockingMethod, printPrecision=3 ):
         self.type = blockingMethod
+        self.prec = printPrecision
 
     def getBlockedData( self, nblocks, data ):
         return self.block( nblocks, data ) 
@@ -102,6 +103,7 @@ class blockFlyvbjergPetersen( BlockingMethod ):
                     "std"       : std, 
                     "std_plus"  : stdPlus, 
                     "std_minus" : stdMinus
+                    
             }
             self.blockDict[M] = out
             
@@ -112,9 +114,10 @@ class blockFlyvbjergPetersen( BlockingMethod ):
         print "M #Blcks  MEAN  VAR  VAR+  VAR-  STD   STD+    STD-"
         print "---------------------------------------------------"
         for k, v in self.blockDict.items():
-            print "{M: <2} {length: <4} {mean:.3f} " \
-                  "{var:.3f} {var_plus:.3f} {var_minus:.3f} " \
-                  "{std:.3f} {std_plus:.3f} {std_minus:.3f} ".format(M=k, **v )
+            print "{M: <2} {length: <4} {mean:.{prec}f} " \
+                  "{var:.{prec}f} {var_plus:.{prec}f} {var_minus:.{prec}f} " \
+                  "{std:.{prec}f} {std_plus:.{prec}f} {std_minus:.{prec}f} ".format(\
+                  M=k, prec=self.prec, **v)
 
     #-----------------------------#
     #   Plot Std. Dev. and its    #

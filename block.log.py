@@ -31,6 +31,8 @@ parser.add_argument( "filename", type=str,
 parser.add_argument( "property", type=str,
                      help="String of property in FILENAME that we would \
                            like to perform block averaging over.")
+parser.add_argument( "-p", "--print-precision", type=int, default=None, dest='printPrecision',
+                     help="Decimal precision for print out. (class default = 3")
 parser.add_argument( "--plot", action="store_true",
                      help="Turn on plotting using PyPlot" )
 parser.add_argument( "--skip_rows", default=0, type=int,
@@ -82,8 +84,11 @@ for key, value in data_dict.items():
     #--------------------------------#
     #   Perform blocking eval on PE  #
     #--------------------------------#
+    kwargs = dict()
+    if args.printPrecision is not None:
+        kwargs = { 'printPrecision' : args.printPrecision }
   
-    bData = blocking.selectBlockMethod( "Flyvbjerg+Petersen" )
+    bData = blocking.selectBlockMethod( "Flyvbjerg+Petersen", **kwargs )
     bData.scanBlocking( data )
     bData.printScanBlocking()
 
