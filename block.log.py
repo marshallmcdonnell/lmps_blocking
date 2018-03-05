@@ -65,7 +65,6 @@ for key, value in data_dict.items():
 
     print "Data file chunk: ", key+1
     data = value[thermo_string][args.skip_rows:]
-    print data
 
     #-------------------------------#
     #    Initialization - Blocking  #
